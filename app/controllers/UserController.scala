@@ -19,6 +19,7 @@ class UserController @Inject()(userRepo: UserRepository, cc: ControllerComponent
   val userForm: Form[CreateUserForm] = Form {
     mapping(
       "name" -> nonEmptyText,
+      "email" -> nonEmptyText,
       "password" -> nonEmptyText,
       "confirmPassword" -> nonEmptyText
     )(CreateUserForm.apply)(CreateUserForm.unapply)
@@ -33,8 +34,9 @@ class UserController @Inject()(userRepo: UserRepository, cc: ControllerComponent
   def saveUser = Action.async { implicit request =>
     val json = request.body.asJson.get
     val user = json.as[CreateUserForm]
-    for {
-      _ <- userRepo.create(user.name, hasPassword(user.password))
-    } yield Ok
+    userRepo.getUserByEmail(user.email).map {
+      case Some(_) => Conflict("user already exist with this email")
+      case None => userRepo.create(user.name, user.email, hasPassword(user.password))
+    }.map(_ => Ok)
   }
 }

@@ -26,18 +26,20 @@ class UserRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(implici
     def userId: Rep[Int] = column[Int]("user_id", O.PrimaryKey, O.AutoInc)
     def name: Rep[String] = column[String]("name")
     val index1 = index("idx1", name)
+    def email: Rep[String] = column[String]("email", O.Unique)
+    val index2 = index("ids2", email)
     def password: Rep[String] = column[String]("password")
 
-    def * = (userId, name) <> ((UserEntity.apply _).tupled, UserEntity.unapply)
+    def * = (userId, name, email) <> ((UserEntity.apply _).tupled, UserEntity.unapply)
   }
 
   val user = TableQuery[UserTable]
 
-  def create(name: String, password: String): Future[UserEntity] = db.run {
-    (user.map(u ⇒ (u.name, u.password))
+  def create(name: String, email: String, password: String): Future[UserEntity] = db.run {
+    (user.map(u ⇒ (u.name, u.email, u.password))
       returning user.map(_.userId)
-      into ((idName, userId) ⇒ UserEntity(userId, idName._1))
-      ) += (name, password)
+      into ((idName, userId) ⇒ UserEntity(userId, idName._1, idName._2))
+      ) += (name, email, password)
   }
 
   def getAllUser: Future[Seq[UserEntity]] =  db.run (user.result)
@@ -46,7 +48,11 @@ class UserRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(implici
     user.filter(_.userId === userId).result.headOption
   }
 
-  val init = TableMigration(user).create.addColumns(_.userId, _.name, _.password).addIndexes(_.index1)
+  def getUserByEmail(email: String): Future[Option[UserEntity]] = db.run {
+    user.filter(_.email === email).result.headOption
+  }
+
+  val init = TableMigration(user).create.addColumns(_.userId, _.name, _.email, _.password).addIndexes(_.index1, _.index2)
 //  val seed = SqlMigration("insert into userById (name, password) values ('test name', 'password')")
 
   val migration = init
