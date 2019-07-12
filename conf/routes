@@ -2,3 +2,6 @@ GET /api/ping controllers.ApiController.ping
 
 GET /api/post/:postId           controllers.ApiController.getPost(postId: Int)
 GET /api/post/:postId/comments  controllers.ApiController.getComments(postId: Int)
+
+GET   /api/users  controllers.UserController.getAllUser
+POST  /api/users  controllers.UserController.saveUser
