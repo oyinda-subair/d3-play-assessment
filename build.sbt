@@ -18,6 +18,8 @@ val paulJwtCore = "com.pauldijou" %% "jwt-core" % "0.19.0"
 val auth0JwksRSA = "com.auth0" % "jwks-rsa" % "0.8.2"
 val auth0JavaJwt = "com.auth0" % "java-jwt" % "3.8.1"
 
+val bcyrpt = "org.mindrot" % "jbcrypt" % "0.3m"
+
 val h2Database = "com.h2database" % "h2" % "1.4.199"
 val postgres = "org.postgresql" % "postgresql" % "42.2.6"
 val forkLift = "com.liyaos" %% "scala-forklift-slick" % "0.3.1"
@@ -64,6 +66,7 @@ lazy val root = (project in file("."))
       paulJwtCore,
       auth0JwksRSA,
       auth0JavaJwt,
+      bcyrpt,
       postgres,
       h2Database,
       slickMigrate,

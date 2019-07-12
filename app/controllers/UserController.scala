@@ -10,7 +10,7 @@ import play.api.i18n._
 import play.api.libs.json.Json
 import play.api.mvc._
 import views.html
-import play.libs.crypto._
+import auth.Security._
 
 import scala.concurrent.ExecutionContext
 
@@ -34,7 +34,7 @@ class UserController @Inject()(userRepo: UserRepository, cc: ControllerComponent
     val json = request.body.asJson.get
     val user = json.as[CreateUserForm]
     for {
-      _ <- userRepo.create(user.name, user.password)
+      _ <- userRepo.create(user.name, hasPassword(user.password))
     } yield Ok
   }
 }
