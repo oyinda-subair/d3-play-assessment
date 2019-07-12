@@ -52,6 +52,9 @@ class UserRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(implici
     user.filter(_.email === email).result.headOption
   }
 
+  def existsByEmail(email: String): Future[Boolean] =
+    db.run(user.filter(_.email === email).exists.result)
+
   val init = TableMigration(user).create.addColumns(_.userId, _.name, _.email, _.password).addIndexes(_.index1, _.index2)
 //  val seed = SqlMigration("insert into userById (name, password) values ('test name', 'password')")
 

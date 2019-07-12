@@ -57,5 +57,25 @@ class UserControllerSpec extends PlaySpecification {
       getUser.get.email mustEqual email
 
      }
+
+    "return conflict if email exist" in new WithApplication {
+      val password: String = string10
+      val email = s"$string10@email.com"
+      val name = s"FooBar $string10"
+
+      val jsonBody: String =
+        s"""
+          {
+          "name": "$name",
+          "email": "$email",
+           "password": "$password"
+          }
+        """.stripMargin
+
+      Await.result(userController.saveUser(FakeRequest().withJsonBody(Json.parse(jsonBody))), Duration.Inf)
+      val result: Future[Result] = userController.saveUser(FakeRequest().withJsonBody(Json.parse(jsonBody)))
+
+      status(result) must equalTo(CONFLICT)
+    }
   }
 }

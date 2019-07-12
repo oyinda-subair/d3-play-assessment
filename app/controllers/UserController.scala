@@ -13,6 +13,7 @@ import views.html
 import auth.Security._
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Success
 
 class UserController @Inject()(userRepo: UserRepository, cc: ControllerComponents)(implicit ec: ExecutionContext) extends AbstractController(cc) with I18nSupport {
 
@@ -32,19 +33,13 @@ class UserController @Inject()(userRepo: UserRepository, cc: ControllerComponent
 
   def saveUser: Action[AnyContent]  = Action.async { implicit request =>
     val json = request.body.asJson.get
-    println(s"json body: $json")
+    
     val user = json.as[CreateUserForm]
-//    userRepo.getUserByEmail(user.email).map {
-//      case Some(_) => Conflict("user already exist with this email")
-//      case None =>
-//        val result = userRepo.create(user.name, user.email, hashPassword(user.password))
-//        result.flatMap(entity => Ok(Json.toJson(entity)))
-//    }
 
-    for {
-//      entityOpt <- userRepo.getUserByEmail(user.email)
-      entity <- userRepo.create(user.name, user.email, hashPassword(user.password))
-    } yield Ok(Json.toJson(entity))
+    userRepo.getUserByEmail(user.email).flatMap {
+      case Some(_) => Future.successful(Conflict("user exist with email address"))
+      case None => userRepo.create(user.name, user.email, hashPassword(user.password)).map(entity => Ok(Json.toJson(entity)))
+    }
   }
 
   def getUserById(id: Int): Action[AnyContent] = Action.async { implicit request =>
