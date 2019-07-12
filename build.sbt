@@ -1,40 +1,75 @@
 name := """d3-play-assessment"""
 organization := "com.example"
-
-version := "1.0-SNAPSHOT"
-
-lazy val root = (project in file(".")).enablePlugins(PlayScala)
-
-scalaVersion := "2.12.8"
+version := "1.0"
 
 val slickVersion = "3.3.2"
+val playVersion = "4.0.2"
 
-libraryDependencies += guice
+val slick = "com.typesafe.slick" %% "slick-hikaricp" % slickVersion
+val slickHikaricp = "com.typesafe.slick" %% "slick-hikaricp" % slickVersion
+val slickCodegen = "com.typesafe.slick" %% "slick-codegen" % "3.2.0"
 
-libraryDependencies ++= Seq(
-//  "org.scalatestplus.play" %% "scalatestplus-play" % "4.0.3" % Test,
-//  "com.typesafe.slick" %% "slick" % "3.3.2",
-  "org.slf4j" % "slf4j-nop" % "1.7.26",
-//  "com.typesafe.slick" %% "slick-hikaricp" % "3.3.2",
-  "com.pauldijou" %% "jwt-play" % "0.19.0",
-  "com.pauldijou" %% "jwt-core" % "0.19.0",
-  "com.auth0" % "jwks-rsa" % "0.8.2",
-  "com.auth0" % "java-jwt" % "3.8.1",
-  "com.typesafe.play" %% "play-slick" % "4.0.2",
-  "com.typesafe.play" %% "play-slick-evolutions" % "4.0.2",
-  "com.h2database" % "h2" % "1.4.199" // replace `${H2_VERSION}` with an actual version number
+val playSlick =  "com.typesafe.play" %% "play-slick" % playVersion
+val playSlickEvolution =  "com.typesafe.play" %% "play-slick-evolutions" % playVersion
+
+val paulJwtPlay = "com.pauldijou" %% "jwt-play" % "0.19.0"
+val paulJwtCore = "com.pauldijou" %% "jwt-core" % "0.19.0"
+
+val auth0JwksRSA = "com.auth0" % "jwks-rsa" % "0.8.2"
+val auth0JavaJwt = "com.auth0" % "java-jwt" % "3.8.1"
+
+val h2Database = "com.h2database" % "h2" % "1.4.199"
+val postgres = "org.postgresql" % "postgresql" % "42.2.6"
+val forkLift = "com.liyaos" %% "scala-forklift-slick" % "0.3.1"
+val slickMigrate = "io.github.nafg" %% "slick-migration-api" % "0.4.0"
+
+val scalaTestPlus = "org.scalatestplus.play" %% "scalatestplus-play" % "4.0.3" % Test
+val scalactic = "org.scalactic" %% "scalactic" % "3.0.8"
+val scalaTest = "org.scalatest" %% "scalatest" % "3.0.8" % "test"
+
+val slf4j = "org.slf4j" % "slf4j-log4j12" % "1.7.26"
+val qosClassic = "ch.qos.logback" % "logback-classic" % "1.2.3"
+val qosCore = "ch.qos.logback" % "logback-core" % "1.2.3"
+
+lazy val commonSettings = Seq(
+  version := "1.0",
+  scalaVersion := "2.12.8",
+  scalacOptions ++= Seq(
+    "-feature",
+    "-deprecation",
+    "-Xfatal-warnings"
+  ),
+  resolvers ++= Seq(
+    "typesafe" at "http://repo.typesafe.com/typesafe/releases/",
+    Resolver.bintrayRepo("naftoligug", "maven"),
+    "bintray" at "https://api.bintray.com/maven/naftoligug/maven/slick-migration-api",
+    Resolver.jcenterRepo,
+    "Artima Maven Repository" at "http://repo.artima.com/releases"
+  )
 )
 
-resolvers += "typesafe" at "http://repo.typesafe.com/typesafe/releases/"
-
-// Adds additional packages into Twirl
-//TwirlKeys.templateImports += "com.example.controllers._"
-
-// Adds additional packages into conf/routes
-// play.sbt.routes.RoutesKeys.routesImport += "com.example.binders._"
-
-scalacOptions ++= Seq(
-  "-feature",
-  "-deprecation",
-  "-Xfatal-warnings"
-)
+//lazy val root = (project in file(".")).enablePlugins(PlayScala)
+lazy val root = (project in file("."))
+  .enablePlugins(PlayScala)
+  .settings(
+    commonSettings,
+    libraryDependencies ++= Seq(
+      guice,
+      slick,
+      slickHikaricp,
+      slickCodegen,
+      playSlick,
+      playSlickEvolution,
+      paulJwtPlay,
+      paulJwtCore,
+      auth0JwksRSA,
+      auth0JavaJwt,
+      postgres,
+      h2Database,
+      slickMigrate,
+      scalaTestPlus,
+      scalactic,
+      scalaTest,
+      specs2 % Test
+    )
+  )
