@@ -3,7 +3,7 @@ import play.libs.crypto._
 import org.mindrot.jbcrypt.BCrypt
 
 object Security {
-  def hasPassword(password: String): String = {
+  def hashPassword(password: String): String = {
     BCrypt.hashpw(password, BCrypt.gensalt())
   }
 

@@ -19,14 +19,6 @@ class ApiController @Inject()(cc: ControllerComponents, dataRepository: DataRepo
 
 //  val Home = Redirect(routes.UserController.list(0, 2, ""))
 
-  val userForm: Form[CreateUserForm] = Form {
-    mapping(
-      "name" -> nonEmptyText,
-      "password" -> nonEmptyText,
-      "confirmPassword" -> nonEmptyText
-    )(CreateUserForm.apply)(CreateUserForm.unapply)
-  }
-
 
   // Create a simple 'ping' endpoint for now, so that we
   // can get up and running with a basic implementation
@@ -45,10 +37,4 @@ class ApiController @Inject()(cc: ControllerComponents, dataRepository: DataRepo
 
     Ok(Json.toJson(dataRepository.getComments(postId)))
   }
-
-  def getAllUser = Action.async { implicit request =>
-    val users = userRepo.getAllUser
-    users.map(u => Ok(Json.toJson(u)))
-  }
-
 }

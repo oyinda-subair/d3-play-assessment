@@ -15,7 +15,6 @@ case class UserRequest[A](jwt: JwtClaim, token: String, request: Request[A]) ext
 // Our custom action implementation
 class AuthAction @Inject()(bodyParser: BodyParsers.Default, authService: AuthService)(implicit ec: ExecutionContext)
   extends ActionBuilder[UserRequest, AnyContent] {
-  println("got here too")
 
   override def parser: BodyParser[AnyContent] = bodyParser
   override protected def executionContext: ExecutionContext = ec

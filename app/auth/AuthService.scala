@@ -16,7 +16,6 @@ class AuthService @Inject()(config: Configuration) {
 
   // Your Auth0 domain, read from configuration
   private def domain = config.get[String]("auth0.domain")
-  println(s"domain: $domain")
 
   // Your Auth0 audience, read from configuration
   private def audience = config.get[String]("auth0.audience")
