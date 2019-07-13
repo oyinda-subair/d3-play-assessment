@@ -1,9 +1,9 @@
 package model
 
-import database.UserRepository
 import org.scalatest.{Matchers, WordSpec}
 import play.api.Application
 import play.api.test.WithApplication
+import repositories.UserRepository
 import testkit.Util._
 
 import scala.concurrent.Await
@@ -35,9 +35,10 @@ class ModelSpec extends WordSpec with Matchers {
     }
 
     "all users" in new WithApplication {
-      val userEntity = Await.result(userRepository.create("Dammy4", s"$string10@email.com", "pass"), Duration.Inf)
+      val name = string10
+      val userEntity = Await.result(userRepository.create(name, s"$name@email.com", "pass"), Duration.Inf)
 
-      val users = Await.result(userRepository.getAllUser, Duration.Inf)
+      val users = Await.result(userRepository.getAllUsers, Duration.Inf)
 
       users.size should be > 0
     }

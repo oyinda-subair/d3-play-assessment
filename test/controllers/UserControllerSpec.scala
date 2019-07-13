@@ -1,12 +1,13 @@
 package controllers
 
-import database.UserRepository
 import models.UserEntity
 import org.scalatestplus.play._
 import play.api.Application
 import play.api.libs.json.Json
 import play.api.mvc._
 import play.api.test.{FakeRequest, PlaySpecification, WithApplication}
+import play.api.test.Helpers._
+import repositories.UserRepository
 import testkit.Util._
 
 import scala.concurrent.{Await, Future}
@@ -45,11 +46,7 @@ class UserControllerSpec extends PlaySpecification {
       status(result) must equalTo(OK)
 
       val content: UserEntity = contentAsJson(result).as[UserEntity]
-//      val request = FakeRequest(POST, "/api/users").withJsonBody(Json.parse(jsonBody))
-//      val result = route(userController, request)
 
-//        contentAsJson(result)
-//
       val getUser:Option[UserEntity] = Await.result(userRepository.getUserById(content.userId), Duration.Inf)
 
       getUser.isDefined mustEqual true
@@ -76,6 +73,43 @@ class UserControllerSpec extends PlaySpecification {
       val result: Future[Result] = userController.saveUser(FakeRequest().withJsonBody(Json.parse(jsonBody)))
 
       status(result) must equalTo(CONFLICT)
+    }
+
+    "getUserById" in new WithApplication {
+      val password: String = string10
+      val email = s"$string10@email.com"
+      val name = s"FooBar $string10"
+
+      val jsonBody: String =
+        s"""
+          {
+          "name": "$name",
+          "email": "$email",
+           "password": "$password"
+          }
+        """.stripMargin
+
+      val result: Future[Result] = userController.saveUser(FakeRequest().withJsonBody(Json.parse(jsonBody)))
+      val content: UserEntity = contentAsJson(result).as[UserEntity]
+
+      val loginBody: String =
+        s"""
+           {
+           "email": "$email",
+           "password": "$password"
+           }
+         """.stripMargin
+
+      val tokenResult: Future[Result] = userController.loginUser(FakeRequest().withJsonBody(Json.parse(loginBody)))
+
+      val tokenString: String = contentAsJson(tokenResult).as[ApplicationToken].token
+
+      val request: Future[Result] = route(app, FakeRequest("GET", s"/api/user/${content.userId}").withHeaders(AUTHORIZATION -> s"Bearer $tokenString")).get
+
+      status(request) must equalTo(OK)
+      val content2: UserEntity = contentAsJson(request).as[UserEntity]
+      content2.userId must equalTo(content.userId)
+
     }
   }
 }

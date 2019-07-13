@@ -1,6 +1,6 @@
 package controllers
 
-import database.UserRepository
+import auth.{AuthAction, AuthenticationAction, JwtService, UserClaim}
 import javax.inject._
 import models.UserEntity
 import play.api.data.Form
@@ -10,10 +10,11 @@ import play.api.i18n._
 import play.api.libs.json.Json
 import play.api.mvc._
 import auth.Security._
+import repositories.UserRepository
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class UserController @Inject()(userRepo: UserRepository, cc: ControllerComponents)(implicit ec: ExecutionContext) extends AbstractController(cc) with I18nSupport {
+class UserController @Inject()(userRepo: UserRepository, authAction: AuthenticationAction, cc: ControllerComponents)(implicit ec: ExecutionContext) extends AbstractController(cc) with I18nSupport {
 
   val userForm: Form[CreateUserForm] = Form {
     mapping(
@@ -23,9 +24,15 @@ class UserController @Inject()(userRepo: UserRepository, cc: ControllerComponent
     )(CreateUserForm.apply)(CreateUserForm.unapply)
   }
 
+  val loginForm: Form[LoginUserForm] = Form {
+    mapping(
+      "email" -> nonEmptyText,
+      "password" -> nonEmptyText
+    )(LoginUserForm.apply)(LoginUserForm.unapply)
+  }
 
   def getAllUser: Action[AnyContent]  = Action.async { implicit request =>
-    val users = userRepo.getAllUser
+    val users = userRepo.getAllUsers
     users.map(u => Ok(Json.toJson(u)))
   }
 
@@ -40,10 +47,29 @@ class UserController @Inject()(userRepo: UserRepository, cc: ControllerComponent
     }
   }
 
-  def getUserById(id: Int): Action[AnyContent] = Action.async { implicit request =>
+  def getUserById(id: Int): Action[AnyContent] = authAction.async { implicit request =>
+//    request.user match {
+//      case UserClaim(userId) if userId == id => userRepo.getUserById(id)
+//      case UserClaim(userId) if userId != id => BadRequest("")
+//    }
     userRepo.getUserById(id).map {
       case Some(entity) => Ok(Json.toJson(entity))
       case None => NotFound(s"user with id: $id was not found")
+    }
+  }
+
+  def loginUser = Action.async { implicit request =>
+    val json = request.body.asJson.get
+
+    val user = json.as[LoginUserForm]
+
+    userRepo.getUserByEmail(user.email).map {
+      case Some(entity) if confirmPassword(user.password, entity.password) =>
+        val payload = Json.toJson(UserClaim(entity.userId)).toString()
+        val token = new JwtService().createToken(payload)
+        Ok(Json.toJson(ApplicationToken(token)))
+      case Some(entity) if !confirmPassword(user.password, entity.password) => BadRequest("Incorrect password")
+      case None => NotFound(s"user with email: ${user.email} was not found")
     }
   }
 }

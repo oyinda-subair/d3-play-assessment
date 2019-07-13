@@ -17,6 +17,7 @@ val paulJwtCore = "com.pauldijou" %% "jwt-core" % "0.19.0"
 
 val auth0JwksRSA = "com.auth0" % "jwks-rsa" % "0.8.2"
 val auth0JavaJwt = "com.auth0" % "java-jwt" % "3.8.1"
+val jasonJwt = "com.jason-goodwin" %% "authentikat-jwt" % "0.4.5"
 
 val bcyrpt = "org.mindrot" % "jbcrypt" % "0.3m"
 
@@ -66,6 +67,7 @@ lazy val root = (project in file("."))
       paulJwtCore,
       auth0JwksRSA,
       auth0JavaJwt,
+      jasonJwt,
       bcyrpt,
       postgres,
       h2Database,
