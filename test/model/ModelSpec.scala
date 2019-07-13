@@ -24,5 +24,22 @@ class ModelSpec extends WordSpec with Matchers {
 
       user.name shouldEqual userEntity.name
     }
+
+    "be retrieved by email" in new WithApplication {
+      val userEntity = Await.result(userRepository.create("Dammy3", s"$string10@email.com", "pass"), Duration.Inf)
+
+      val user = Await.result(userRepository.getUserByEmail(userEntity.email), Duration.Inf).get
+
+      user.name shouldEqual userEntity.name
+      user.email shouldEqual userEntity.email
+    }
+
+    "all users" in new WithApplication {
+      val userEntity = Await.result(userRepository.create("Dammy4", s"$string10@email.com", "pass"), Duration.Inf)
+
+      val users = Await.result(userRepository.getAllUser, Duration.Inf)
+
+      users.size should be > 0
+    }
   }
 }

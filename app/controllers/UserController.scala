@@ -9,11 +9,9 @@ import play.api.data.validation.Constraints._
 import play.api.i18n._
 import play.api.libs.json.Json
 import play.api.mvc._
-import views.html
 import auth.Security._
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.Success
 
 class UserController @Inject()(userRepo: UserRepository, cc: ControllerComponents)(implicit ec: ExecutionContext) extends AbstractController(cc) with I18nSupport {
 
@@ -33,7 +31,7 @@ class UserController @Inject()(userRepo: UserRepository, cc: ControllerComponent
 
   def saveUser: Action[AnyContent]  = Action.async { implicit request =>
     val json = request.body.asJson.get
-    
+
     val user = json.as[CreateUserForm]
 
     userRepo.getUserByEmail(user.email).flatMap {
