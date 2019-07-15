@@ -12,7 +12,8 @@ import repositories.PostRepository
 
 import scala.concurrent.ExecutionContext
 
-class PostController @Inject()(postRepo: PostRepository, authAction: AuthenticationAction, cc: ControllerComponents)(implicit ec: ExecutionContext) extends AbstractController(cc) with I18nSupport {
+class PostController @Inject()(postRepo: PostRepository, authAction: AuthenticationAction, cc: ControllerComponents)
+                              (implicit ec: ExecutionContext) extends AbstractController(cc) with I18nSupport {
   val userForm: Form[CreatePostForm] = Form {
     mapping(
       "title" -> nonEmptyText,
@@ -37,7 +38,7 @@ class PostController @Inject()(postRepo: PostRepository, authAction: Authenticat
     } yield Ok(Json.toJson(postEntity))
   }
 
-  def getAllPost = Action.async { implicit request =>
+  def getAllPost: Action[AnyContent] = Action.async { implicit request =>
     for {
       postEntity <- postRepo.getAllPosts
     } yield Ok(Json.toJson(postEntity))

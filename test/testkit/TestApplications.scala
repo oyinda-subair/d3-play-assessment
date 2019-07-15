@@ -21,7 +21,7 @@ trait TestApplications {
     app2Application(app)
   }
 
-  def repoRepository(implicit app: Application): PostRepository = {
+  def postRepository(implicit app: Application): PostRepository = {
     val app2UserRepository = Application.instanceCache[PostRepository]
     app2UserRepository(app)
   }

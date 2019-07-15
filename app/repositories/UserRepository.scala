@@ -8,7 +8,6 @@ import slick.basic.DatabaseConfig
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.{ExecutionContext, Future}
-//import scala.concurrent.ExecutionContext.Implicits.global
 
 
 @Singleton
@@ -19,7 +18,6 @@ class UserRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(implici
   import profile.api._
   import slick.migration.api._
 
-//  val db = Database.forConfig("db")
   implicit val dialect: PostgresDialect = new PostgresDialect
 
   class UserTable(tag: Tag) extends Table[UserEntity](tag, "user_by_id"){
@@ -52,13 +50,8 @@ class UserRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(implici
     Users.filter(_.email === email).result.headOption
   }
 
-  def existsByEmail(email: String): Future[Boolean] =
-    db.run(Users.filter(_.email === email).exists.result)
-
-//  object Users extends TableQuery(new UserTable(_)) {
-//    val findById = this.findBy(_.id)
-//    // more methods there
-//  }
+//  def existsByEmail(email: String): Future[Boolean] =
+//    db.run(Users.filter(_.email === email).exists.result)
 
   val init = TableMigration(Users).create.addColumns(_.id, _.name, _.email, _.password).addIndexes(_.index1, _.index2)
 //  val seed = SqlMigration("insert into userById (name, password) values ('test name', 'password')")

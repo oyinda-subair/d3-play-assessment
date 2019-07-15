@@ -48,20 +48,9 @@ class CommentRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(impl
 
   def getAllComments: Future[Seq[CommentEntity]] =  db.run (Comments.result)
 
-//  def getPost = for {
-//    post <- Posts
-//    comments <- post.user
-//  }
-
   def getCommentsByPostId(postId: Int): Future[Seq[CommentEntity]] = db.run {
     Comments.filter(_.postId === postId).result
   }
-
-//  object Comment extends TableQuery(new CommentTable(_)) {
-//    val findById = this.findBy(_.id)
-//    // more methods there
-//  }
-
 
   val init = TableMigration(Comments).create.addColumns(_.id, _.text, _.postId, _.userId).addForeignKeys(_.posts, _.users)
   //  val seed = SqlMigration("insert into userById (name, password) values ('test name', 'password')")

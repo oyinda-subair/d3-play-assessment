@@ -7,9 +7,13 @@ GET   /api/v1/user/:userId      controllers.v1.UserController.getUserById(userId
 POST  /login                    controllers.v1.UserController.loginUser
 
 +nocsrf
-POST /api/v1/posts                 controllers.v1.PostController.createPost
-GET  /api/v1/posts                 controllers.v1.PostController.getAllPost
-GET  /api/v1/posts/user/:userId    controllers.v1.PostController.getPostByUserId(userId: Int)
+POST /api/v1/posts                  controllers.v1.PostController.createPost
 
-GET /api/v1/post/:postId           controllers.ApiController.getPost(postId: Int)
-GET /api/v1/post/:postId/comments  controllers.ApiController.getComments(postId: Int)
+GET  /api/v1/posts                  controllers.v1.PostController.getAllPost
+GET  /api/v1/posts/user/:userId     controllers.v1.PostController.getPostByUserId(userId: Int)
+
+POST /api/v1/post/:postId/comments  controllers.v1.CommentController.createComment(postId: Int)
+GET /api/v1/post/:postId/comments   controllers.v1.CommentController.getCommentsByPostId(postId: Int)
+
+GET /api/v1/post/:postId            controllers.ApiController.getPost(postId: Int)
+GET /api/v1/post/:postId/comments   controllers.ApiController.getComments(postId: Int)
