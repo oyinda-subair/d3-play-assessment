@@ -14,9 +14,9 @@ class DataRepository {
 
   // Specify some comments for our API to serve up
   private val comments = Seq(
-    CommentEntity(1, 1, "This is an awesome blog post", 1),
-    CommentEntity(2, 1, "Thanks for the insights", 2),
-    CommentEntity(3, 2, "Great, thanks for this post", 1)
+    CommentEntity(1, "This is an awesome blog post", 1, 1),
+    CommentEntity(2, "Thanks for the insights", 1, 2),
+    CommentEntity(3, "Great, thanks for this post", 2, 1)
   )
 
   /*

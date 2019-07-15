@@ -1,15 +1,14 @@
-package controllers
+package controllers.v1
 
-import auth.{AuthAction, AuthenticationAction, JwtService, UserClaim}
+import auth.Security._
+import auth.{AuthenticationAction, JwtService, UserClaim}
+import controllers.form.{ApplicationToken, CreateUserForm, LoginUserForm}
 import javax.inject._
-import models.UserEntity
 import play.api.data.Form
 import play.api.data.Forms._
-import play.api.data.validation.Constraints._
 import play.api.i18n._
 import play.api.libs.json.Json
 import play.api.mvc._
-import auth.Security._
 import repositories.UserRepository
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -67,7 +66,7 @@ class UserController @Inject()(userRepo: UserRepository, authAction: Authenticat
       case Some(entity) if confirmPassword(user.password, entity.password) =>
         val payload = Json.toJson(UserClaim(entity.userId)).toString()
         val token = new JwtService().createToken(payload)
-        Ok(Json.toJson(ApplicationToken(token)))
+        Ok(Json.toJson(ApplicationToken(token))).withCookies(Cookie("authorization", token, None, "/", None, false, false))
       case Some(entity) if !confirmPassword(user.password, entity.password) => BadRequest("Incorrect password")
       case None => NotFound(s"user with email: ${user.email} was not found")
     }

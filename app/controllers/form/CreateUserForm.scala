@@ -1,4 +1,4 @@
-package controllers
+package controllers.form
 
 import play.api.libs.json._
 

@@ -21,3 +21,12 @@ class Module(environment: Environment, configuration: Configuration) extends Abs
     bind(classOf[Database]).toProvider(classOf[H2Connector])
   }
 }
+
+//trait DbConfiguration extends DB {
+//  lazy val config = DatabaseConfig.forConfig[JdbcProfile]("db")
+//}
+//
+//trait DB{
+//  val config: DatabaseConfig[JdbcProfile]
+//  val db: JdbcProfile#Backend#Database = config.db
+//}

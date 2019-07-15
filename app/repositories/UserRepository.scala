@@ -4,6 +4,7 @@ import config.ApplicationConfig
 import javax.inject.{Inject, Singleton}
 import models.UserEntity
 import play.api.db.slick.DatabaseConfigProvider
+import slick.basic.DatabaseConfig
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -22,44 +23,44 @@ class UserRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(implici
   implicit val dialect: PostgresDialect = new PostgresDialect
 
   class UserTable(tag: Tag) extends Table[UserEntity](tag, "user_by_id"){
-    def userId: Rep[Int] = column[Int]("user_id", O.PrimaryKey, O.AutoInc)
+    def id: Rep[Int] = column[Int]("user_id", O.PrimaryKey, O.AutoInc)
     def name: Rep[String] = column[String]("name")
     val index1 = index("idx1", name)
     def email: Rep[String] = column[String]("email", O.Unique)
     val index2 = index("ids2", email)
     def password: Rep[String] = column[String]("password")
 
-    def * = (userId, name, email, password) <> ((UserEntity.apply _).tupled, UserEntity.unapply)
+    def * = (id, name, email, password) <> ((UserEntity.apply _).tupled, UserEntity.unapply)
   }
 
-  val user = TableQuery[UserTable]
+  val Users = TableQuery[UserTable]
 
   def create(name: String, email: String, password: String): Future[UserEntity] = db.run {
-    (user.map(u ⇒ (u.name, u.email, u.password))
-      returning user.map(_.userId)
+    (Users.map(u ⇒ (u.name, u.email, u.password))
+      returning Users.map(_.id)
       into ((idName, userId) ⇒ UserEntity(userId, idName._1, idName._2, idName._3))
       ) += (name, email, password)
   }
 
-  def getAllUsers: Future[Seq[UserEntity]] =  db.run (user.result)
+  def getAllUsers: Future[Seq[UserEntity]] =  db.run (Users.result)
 
   def getUserById(userId: Int): Future[Option[UserEntity]] = db.run {
-    user.filter(_.userId === userId).result.headOption
+    Users.filter(_.id === userId).result.headOption
   }
 
   def getUserByEmail(email: String): Future[Option[UserEntity]] = db.run {
-    user.filter(_.email === email).result.headOption
+    Users.filter(_.email === email).result.headOption
   }
 
   def existsByEmail(email: String): Future[Boolean] =
-    db.run(user.filter(_.email === email).exists.result)
+    db.run(Users.filter(_.email === email).exists.result)
 
-  object Users extends TableQuery(new UserTable(_)) {
-    val findByName = this.findBy(_.name)
-    // more methods there
-  }
+//  object Users extends TableQuery(new UserTable(_)) {
+//    val findById = this.findBy(_.id)
+//    // more methods there
+//  }
 
-  val init = TableMigration(user).create.addColumns(_.userId, _.name, _.email, _.password).addIndexes(_.index1, _.index2)
+  val init = TableMigration(Users).create.addColumns(_.id, _.name, _.email, _.password).addIndexes(_.index1, _.index2)
 //  val seed = SqlMigration("insert into userById (name, password) values ('test name', 'password')")
 
   val migration = init

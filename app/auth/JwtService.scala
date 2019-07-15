@@ -2,13 +2,14 @@ package auth
 
 import authentikat.jwt.{JsonWebToken, JwtClaimsSet, JwtHeader}
 //import pdi.jwt.JwtClaim
+import config.ApplicationConfig
 
 import scala.util.{Failure, Success, Try}
 
 class JwtService {
 
-  val JwtSecretKey = "secretKey"
-  val JwtSecretAlgo = "HS256"
+  val JwtSecretKey = ApplicationConfig.jwtSecret
+  val JwtSecretAlgo = ApplicationConfig.algo
 
   def createToken(payload: String): String = {
     val header = JwtHeader(JwtSecretAlgo)
