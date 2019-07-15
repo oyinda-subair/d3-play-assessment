@@ -105,6 +105,39 @@ class UserControllerSpec extends PlaySpecification with TestApplications {
 
     }
 
+    "return 404 for non-existing user id" in new WithApplication {
+      val password: String = string10
+
+      val jsonBody: String =
+        s"""
+           {
+             "name": "$string10",
+               "email": "$string10",
+             "password": "$password"
+              }
+         """.stripMargin
+
+      val result: Future[Result] = userController.saveUser(FakeRequest().withJsonBody(Json.parse(jsonBody)))
+      val content: UserEntity = contentAsJson(result).as[UserEntity]
+
+      val loginBody: String =
+        s"""
+           {
+           "email": "${content.email}",
+           "password": "$password"
+           }
+         """.stripMargin
+
+      val tokenResult: Future[Result] = userController.loginUser(FakeRequest().withJsonBody(Json.parse(loginBody)))
+
+      val tokenString: String = contentAsJson(tokenResult).as[ApplicationToken].token
+
+      val request: Future[Result] = route(app, FakeRequest("GET", s"/api/v1/user/1000").withHeaders(AUTHORIZATION -> s"Bearer $tokenString")).get
+
+      status(request) must equalTo(NOT_FOUND)
+
+    }
+
     "login user" in new WithApplication {
       val password: String = string10
       val email = s"$string10@email.com"
@@ -135,6 +168,62 @@ class UserControllerSpec extends PlaySpecification with TestApplications {
       val content: ApplicationToken = contentAsJson(request).as[ApplicationToken]
 
       content.token.isEmpty must equalTo(false)
+    }
+
+    "return 400 for wrong password at login" in new WithApplication {
+
+      val jsonBody: String =
+        s"""
+           {
+             "name": "$string10",
+               "email": "$string10",
+             "password": "$string10"
+              }
+         """.stripMargin
+
+      val result: Future[Result] = userController.saveUser(FakeRequest().withJsonBody(Json.parse(jsonBody)))
+      val content: UserEntity = contentAsJson(result).as[UserEntity]
+
+      val loginBody: String =
+        s"""
+           {
+           "email": "${content.email}",
+           "password": "$string10"
+           }
+         """.stripMargin
+
+      val tokenResult: Future[Result] = userController.loginUser(FakeRequest().withJsonBody(Json.parse(loginBody)))
+
+      status(tokenResult) must equalTo(BAD_REQUEST)
+
+    }
+
+    "return 404 for invalid email at login" in new WithApplication {
+
+      val jsonBody: String =
+        s"""
+           {
+             "name": "$string10",
+               "email": "$string10",
+             "password": "$string10"
+              }
+         """.stripMargin
+
+      val result: Future[Result] = userController.saveUser(FakeRequest().withJsonBody(Json.parse(jsonBody)))
+      val content: UserEntity = contentAsJson(result).as[UserEntity]
+
+      val loginBody: String =
+        s"""
+           {
+           "email": "$string10",
+           "password": "$string10"
+           }
+         """.stripMargin
+
+      val tokenResult: Future[Result] = userController.loginUser(FakeRequest().withJsonBody(Json.parse(loginBody)))
+
+      status(tokenResult) must equalTo(NOT_FOUND)
+
     }
   }
 }
