@@ -15,7 +15,7 @@ import scala.concurrent.ExecutionContext
 class CommentController @Inject()(commentRepo: CommentRepository, authAction: AuthenticationAction, cc: ControllerComponents)
                                  (implicit ec: ExecutionContext) extends AbstractController(cc) with I18nSupport {
 
-  val userForm: Form[CreateCommentForm] = Form {
+  val commentForm: Form[CreateCommentForm] = Form {
     mapping(
       "text" -> nonEmptyText
     )(CreateCommentForm.apply)(CreateCommentForm.unapply)

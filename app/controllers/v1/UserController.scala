@@ -47,17 +47,13 @@ class UserController @Inject()(userRepo: UserRepository, authAction: Authenticat
   }
 
   def getUserById(id: Int): Action[AnyContent] = authAction.async { implicit request =>
-//    request.user match {
-//      case UserClaim(userId) if userId == id => userRepo.getUserById(id)
-//      case UserClaim(userId) if userId != id => BadRequest("")
-//    }
     userRepo.getUserById(id).map {
       case Some(entity) => Ok(Json.toJson(entity))
       case None => NotFound(s"user with id: $id was not found")
     }
   }
 
-  def loginUser = Action.async { implicit request =>
+  def loginUser: Action[AnyContent] = Action.async { implicit request =>
     val json = request.body.asJson.get
 
     val user = json.as[LoginUserForm]

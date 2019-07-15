@@ -1,8 +1,8 @@
 package testkit
 
-import controllers.v1.{PostController, UserController}
+import controllers.v1.{CommentController, PostController, UserController}
 import play.api.Application
-import repositories.{PostRepository, UserRepository}
+import repositories.{CommentRepository, PostRepository, UserRepository}
 
 trait TestApplications {
 
@@ -23,6 +23,16 @@ trait TestApplications {
 
   def postRepository(implicit app: Application): PostRepository = {
     val app2UserRepository = Application.instanceCache[PostRepository]
+    app2UserRepository(app)
+  }
+
+  def commentController(implicit app: Application): CommentController = {
+    val app2Application = Application.instanceCache[CommentController]
+    app2Application(app)
+  }
+
+  def commentRepository(implicit app: Application): CommentRepository = {
+    val app2UserRepository = Application.instanceCache[CommentRepository]
     app2UserRepository(app)
   }
 

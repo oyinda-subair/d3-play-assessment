@@ -14,7 +14,7 @@ import scala.concurrent.ExecutionContext
 
 class PostController @Inject()(postRepo: PostRepository, authAction: AuthenticationAction, cc: ControllerComponents)
                               (implicit ec: ExecutionContext) extends AbstractController(cc) with I18nSupport {
-  val userForm: Form[CreatePostForm] = Form {
+  val postForm: Form[CreatePostForm] = Form {
     mapping(
       "title" -> nonEmptyText,
       "content" -> nonEmptyText

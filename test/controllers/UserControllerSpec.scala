@@ -48,6 +48,31 @@ class UserControllerSpec extends PlaySpecification with TestApplications {
 
      }
 
+    "get all users" in new WithApplication {
+      val password: String = string10
+      val email = s"$string10@email.com"
+      val name = s"FooBar $string10"
+
+      val jsonBody: String =
+        s"""
+          {
+          "name": "$name",
+          "email": "$email",
+           "password": "$password"
+          }
+        """.stripMargin
+
+      val result: Future[Result] = userController.saveUser(FakeRequest().withJsonBody(Json.parse(jsonBody)))
+      status(result) must equalTo(OK)
+
+      val content: UserEntity = contentAsJson(result).as[UserEntity]
+
+      val getUser: Seq[UserEntity] = Await.result(userRepository.getAllUsers, Duration.Inf)
+
+      getUser.isEmpty mustEqual false
+
+    }
+
     "return conflict if email exist" in new WithApplication {
       val password: String = string10
       val email = s"$string10@email.com"
