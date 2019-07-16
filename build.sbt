@@ -58,6 +58,8 @@ lazy val root = (project in file("."))
     commonSettings,
     libraryDependencies ++= Seq(
       guice,
+      ws,
+      ehcache,
       slick,
       slickHikaricp,
       slickCodegen,
